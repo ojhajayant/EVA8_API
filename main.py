@@ -91,11 +91,8 @@ def main_session_7_resnet():
 
     # Data Statistics: It is important to know your data very well. Let's
     # check some statistics around our data and how it actually looks like
-    # But do it during the "train" run (during "lr_find" & "test" we don't
-    # need to know as we already know from "train" run)
-    if args.cmd == 'train':
-        preprocess.get_data_stats(train_dataset, test_dataset, train_loader)
-        misc.plot_train_samples(train_loader, args.batch_size)
+    preprocess.get_data_stats(train_dataset, test_dataset, train_loader)
+    misc.plot_train_samples(train_loader, args.batch_size)
 
     # Using L1-regularization here (l1_weight = 0.000025, reusing some older
     # assignment values, but works OK here too)
