@@ -46,6 +46,8 @@ parser.add_argument('--end_lr', default=1, type=float,
                     help='lr upper range value used for the LR-range-test')
 parser.add_argument('--lr_range_test_epochs', '-E', default=100, type=int,
                     help='epoch value used for the LR-range-test')
+parser.add_argument('--best_lr', default=1.009999999999, type=float,
+                    help='Best LR value found thru LR-range-test & supplied thru cmd-prompt during train-run')
 parser.add_argument('--cycle_momentum', default=True, type=bool,
                     help='Make cyclic changes to momentum value during OCP?')
 parser.add_argument('--optimizer', default=optim.SGD, type=type(optim.SGD),
