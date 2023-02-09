@@ -32,7 +32,7 @@ parser.add_argument('--img_size', '-I', default=(32, 32), type=tuple,
                     help='Image Size')
 parser.add_argument('--batch_size', '-b', default=128, type=int,
                     help='batch size')
-parser.add_argument('--epochs', '-e', default=2, type=int,
+parser.add_argument('--epochs', '-e', default=20, type=int,
                     help='training epochs')
 # Below (lr=0.01) was the default for the custom model architecture used for S7
 # parser.add_argument('--lr', default=0.01, type=float, help='learning rate')
