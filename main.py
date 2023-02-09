@@ -137,7 +137,7 @@ def main_session_7_resnet():
         print("best_lr is {}".format(best_lr))
     elif args.cmd == 'train':
         print("Model training starts on {} dataset".format(args.dataset))
-        best_lr = 0.14999999995000002
+        best_lr = args.best_lr
 
         # Setup optimizer & scheduler parameters for OCP
         CYCLE_MOMENTUM = args.cycle_momentum  # If True, momentum value cycles
@@ -213,17 +213,4 @@ def main_session_7_resnet():
 if __name__ == '__main__':
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
-
-    # args.dataset = 'CIFAR10'
-    # args.cmd = 'lr_find'
-    # args.IPYNB_ENV = 'False'
-    # args.epochs = 40
-    # args.use_albumentations = True
-    # main_session_7_resnet()
-    # --------
-    args.dataset = 'CIFAR10'
-    args.cmd = 'lr_find'
-    args.IPYNB_ENV = 'False'
-    # args.epochs = 40
-    args.use_albumentations = True
     main_session_7_resnet()
