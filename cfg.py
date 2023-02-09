@@ -13,10 +13,7 @@ import matplotlib.pyplot as plt
 
 sys.path.append('./')
 IPYNB_ENV = True  # By default ipynb notebook env
-# The AGG backend(for matplotlib) is for writing to "file", not for rendering
-# in a "window".
-if not IPYNB_ENV:
-    plt.switch_backend('agg')
+
 parser = argparse.ArgumentParser(
     description='Training and Validation on CIFAR10 Dataset')
 parser.add_argument('--cmd', default='train',
