@@ -9,6 +9,7 @@ import sys
 import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from IPython.display import display
 import numpy as np
 import torch
 from torchvision import datasets, transforms
@@ -171,4 +172,5 @@ def get_data_stats(train_dataset, test_dataset, train_loader):
         plt.savefig('plot1.png')
         from IPython.display import Image
         Image(filename='plot1.png')
+        display(plt.gcf())
         plt.show()
