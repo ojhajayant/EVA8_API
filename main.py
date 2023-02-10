@@ -183,7 +183,6 @@ def main_session_7_resnet():
     elif args.cmd == 'test':
         print("Model inference starts on {}  dataset".format(args.dataset))
         model_name = args.best_model
-#         model_name = 'CIFAR10_model_epoch-2_L1-1_L2-0_val_acc-65.12.h5'
         print("Loaded the best model: {} from last training session".format(
             model_name))
         model = misc.load_model(resnet18.ResNet18(), device,
