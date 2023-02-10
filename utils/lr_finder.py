@@ -10,7 +10,6 @@ import torch
 from tqdm.autonotebook import tqdm
 from torch.optim.lr_scheduler import _LRScheduler
 import matplotlib.pyplot as plt
-%matplotlib inline
 import cfg
 from utils import misc
 from models import resnet18
