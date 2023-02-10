@@ -9,6 +9,8 @@ import sys
 import torch
 from tqdm.autonotebook import tqdm
 from torch.optim.lr_scheduler import _LRScheduler
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import cfg
 from utils import misc
