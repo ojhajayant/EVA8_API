@@ -476,6 +476,9 @@ class LRFinder(object):
 
         # Show only if the figure was created internally
         if fig is not None:
+            plt.savefig('plot13.png')
+            from IPython.display import Image
+            Image(filename='plot13.png')
             plt.show()
 
         return ax
@@ -537,6 +540,9 @@ class LRFinder(object):
 
         # Show only if the figure was created internally
         if fig is not None:
+            plt.savefig('plot14.png')
+            from IPython.display import Image
+            Image(filename='plot14.png')
             plt.show()
 
         return ax
