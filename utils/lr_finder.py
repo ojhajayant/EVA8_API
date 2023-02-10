@@ -12,6 +12,7 @@ from torch.optim.lr_scheduler import _LRScheduler
 import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from IPython.display import display
 import cfg
 from utils import misc
 from models import resnet18
@@ -479,6 +480,7 @@ class LRFinder(object):
             plt.savefig('plot13.png')
             from IPython.display import Image
             Image(filename='plot13.png')
+            display(plt.gcf())
             plt.show()
 
         return ax
@@ -543,6 +545,7 @@ class LRFinder(object):
             plt.savefig('plot14.png')
             from IPython.display import Image
             Image(filename='plot14.png')
+            display(plt.gcf())
             plt.show()
 
         return ax
