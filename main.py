@@ -34,12 +34,6 @@ from utils import train
 from utils import misc
 from utils import lr_finder
 
-sys.path.append('./')
-global args
-args = cfg.args
-if args.cmd == None:
-    args.cmd = 'train'
-
 import sys
 
 sys.path.append('./')
@@ -213,4 +207,5 @@ def main_session_7_resnet():
 if __name__ == '__main__':
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
+    args = cfg.get_args()
     main_session_7_resnet()
