@@ -8,7 +8,6 @@ import os
 import sys
 
 import matplotlib.pyplot as plt
-%matplotlib inline
 import numpy as np
 import torch
 from torchvision import datasets, transforms
