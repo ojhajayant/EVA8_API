@@ -167,4 +167,7 @@ def get_data_stats(train_dataset, test_dataset, train_loader):
     if not args.IPYNB_ENV:
         plt.savefig(filepath)
     if args.IPYNB_ENV:
+        plt.savefig('plot1.png')
+        from IPython.display import Image
+        Image(filename='plot1.png')
         plt.show()
