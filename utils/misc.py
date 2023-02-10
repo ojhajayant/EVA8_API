@@ -23,8 +23,9 @@ from pytorch_grad_cam import GradCAM
 import cfg
 
 sys.path.append('./')
-global args
-args = cfg.args
+from cfg import get_args
+
+args = get_args()
 file_path = args.data
 
 
