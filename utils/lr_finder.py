@@ -676,7 +676,7 @@ class DataLoaderIterWrapper(object):
 def find_network_lr(model, criterion, optimizer, device, train_loader, init_lr,
                     init_weight_decay, end_lr=1, num_epochs=100):
     print(
-        f"Finding max LR for One Cycle Policy using LR Test Range over {num_epochs} epochs...")
+        f"Finding max LR for One Cycle Policy, using LR-Range Test  over {num_epochs} epochs...")
     lr_range_test_optimizer = optimizer(model.parameters(), lr=init_lr,
                                         weight_decay=init_weight_decay)
     lr_finder = LRFinder(model, lr_range_test_optimizer, criterion,
