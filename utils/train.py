@@ -13,10 +13,13 @@ from tqdm import tqdm
 import cfg
 from utils import misc
 
+import cfg
+
 sys.path.append('./')
-# args = cfg.parser.parse_args(args=[])
-global args
-args = cfg.args
+from cfg import get_args
+
+args = get_args()
+file_path = args.data
 
 
 def train(model, device, train_loader, optimizer, epoch, criterion,
