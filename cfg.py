@@ -46,9 +46,9 @@ def get_args():
     parser.add_argument('--criterion', default=nn.NLLLoss(),
                         type=nn.modules.loss._Loss,
                         help='The loss function to be used during training')
-    parser.add_argument('--init_lr', default=1e-10, type=float,
+    parser.add_argument('--init_lr', default=1e-4, type=float,
                         help='lr lower range value used for the LR-range-test')
-    parser.add_argument('--end_lr', default=0.5, type=float,
+    parser.add_argument('--end_lr', default=0.05, type=float,
                         help='lr upper range value used for the LR-range-test')
     parser.add_argument('--lr_range_test_epochs', '-E', default=100, type=int,
                         help='epoch value used for the LR-range-test')
