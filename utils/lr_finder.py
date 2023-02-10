@@ -16,7 +16,9 @@ from models import resnet18
 
 sys.path.append('./')
 global args
-args = cfg.args
+from cfg import get_args
+
+args = get_args()
 file_path = args.data
 
 try:
