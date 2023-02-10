@@ -12,6 +12,7 @@ import cv2
 import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+from IPython.display import display
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -61,12 +62,14 @@ def plot_train_samples(train_loader, batch_size):
         plt.savefig('plot2.png')
         from IPython.display import Image
         Image(filename='plot2.png')
+        display(plt.gcf())
         if not args.IPYNB_ENV:
             plt.savefig(filepath)
     if args.IPYNB_ENV:
         plt.savefig('plot3.png')
         from IPython.display import Image
         Image(filename='plot3.png')
+        display(plt.gcf())
         plt.show()
     print("Here are a few samples AFTER TRANSFORMS APPLIED:")
     batch = next(iter(train_loader))
@@ -77,6 +80,7 @@ def plot_train_samples(train_loader, batch_size):
     plt.savefig('plot4.png')
     from IPython.display import Image
     Image(filename='plot4.png')
+    display(plt.gcf())
     plt.show()
 
 
@@ -165,12 +169,14 @@ def display_mislabelled(model, device, x_test, y_test, y_pred, test_dataset,
             plt.savefig('plot5.png')
             from IPython.display import Image
             Image(filename='plot5.png')
+            display(plt.gcf())
             if not args.IPYNB_ENV:
                 plt.savefig(filepath)
     if args.IPYNB_ENV:
         plt.savefig('plot6.png')
         from IPython.display import Image
         Image(filename='plot6.png')
+        display(plt.gcf())
         plt.show()
 
 
@@ -237,6 +243,7 @@ def plot_acc():
     plt.savefig('plot7.png')
     from IPython.display import Image
     Image(filename='plot7.png')
+    display(plt.gcf())
     _ = plt.show()
 
 
@@ -253,6 +260,7 @@ def plot_momentum_lr():
     plt.savefig('plot8.png')
     from IPython.display import Image
     Image(filename='plot8.png')
+    display(plt.gcf())
     _ = plt.show()
 
 
@@ -281,6 +289,7 @@ def plot_acc_loss():
         plt.savefig('plot9.png')
         from IPython.display import Image
         Image(filename='plot9.png')
+        display(plt.gcf())
         fig.show()
 
 
@@ -359,14 +368,17 @@ def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
                     im_orig = im_orig.permute(0, 2, 3, 1).squeeze().numpy()
                     _ = ax.imshow(np.clip(im_orig, 0, 1))
                     plt.savefig('plot10.png')
+                    display(plt.gcf())
                     from IPython.display import Image
                     Image(filename='plot10.png')
+                    display(plt.gcf())
                 else:
                     super_imposed_img = superimpose(im_orig, heatmap)
                     _ = ax.imshow(super_imposed_img)
                     plt.savefig('plot11.png')
                     from IPython.display import Image
                     Image(filename='plot11.png')
+                    display(plt.gcf())
                 _ = fig.add_subplot(ax)
         if not args.IPYNB_ENV:
             fig.show()
@@ -376,4 +388,5 @@ def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
     plt.savefig('plot12.png')
     from IPython.display import Image
     Image(filename='plot12.png')
+    display(plt.gcf())
     plt.show()
