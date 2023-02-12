@@ -25,14 +25,19 @@
 	    !python /content/EVA8_API/main.py --cmd test --best_model CIFAR10_model_epoch-20_L1-1_L2-0_val_acc-90.6.h5
 	    
 	    ```
-2. models/resnet.py or others.py...: These are the model-code files, defining the required classes for aech neural network.
+2. models/resnet.py or others.py...: These are the model-code files, defining the required classes
+   for aech neural network.
 3. utils folder: This has all the 'utility' code used across.
-	> a. utils/preprocess.py: This code is to download & preprocess data (calculate mean/std dev, or applying "torchvision-based" transforms only).
-	> b. utils/preprocess_albumentations.py: This code is to apply "albumentations-lib-based" transforms only.
+	> a. utils/preprocess.py: This code is to download & preprocess data (calculate mean/std dev,
+	     or applying "torchvision-based" transforms only).
+	> b. utils/preprocess_albumentations.py: This code is to apply "albumentations-lib-based" 
+	     transforms only.
 	> c. utils/train.py: This has the model-training code.
 	> d. utils/test.py: This has the model-inference code.
-	> e. utils/lr_find.py: This has the LR-rate finder code esp for the code to enable LR-range test (as required for OCP policy)
-	> f. utils/misc.py: This has miscellaneous other funtions to plot curves (accuracy/loss, L1-penalty, misclassified with without grad-cam display etc.
+	> e. utils/lr_find.py: This has the LR-rate finder code esp for the code to enable LR-range 
+	     test (as required for OCP policy)
+	> f. utils/misc.py: This has miscellaneous other funtions to plot curves (accuracy/loss, 
+	     L1-penalty, misclassified with without grad-cam display etc.
 
 The downloaded datset or any other intermediate plots or config.txt files are saved to the ./data (or 
 user-provided folder)
