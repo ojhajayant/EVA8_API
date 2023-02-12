@@ -4,6 +4,41 @@
 
 > Here are a little details on the above struct:
 
+```
+0. cfg.py: This has the default and/or user-supplied top-level configuration values & global-vars.
+1. main.py: This is the main script to be run to either find  appropriate LR, train or make inference.
+
+            example usage is as below:
+	    
+            1. "lr_find" cmd:
+	    ```
+	    !python /content/EVA8_API/main.py --cmd lr_find
+	    ```
+	    
+	    2. "train" cmd:
+	    ```
+	    !python /content/EVA8_API/main.py --cmd train --best_lr 0.050499
+	    ```
+	    
+	    3. "test" cmd:
+	    ```
+	    !python /content/EVA8_API/main.py --cmd test --best_model CIFAR10_model_epoch-20_L1-1_L2-0_val_acc-90.6.h5
+	    
+	    ```
+2. models/resnet.py or others.py...: These are the model-code files, defining the required classes for aech neural network.
+3. utils/preprocess.py: This code is to download & preprocess data (calculate mean/std dev, or applying "torchvision-based" transforms only).
+4. utils/preprocess_albumentations.py: This code is to apply "albumentations-lib-based" transforms only.
+5. utils/utils.py: This has all the 'utility' code used across.
+6. utils/train.py: This has the model-training code.
+7. utils/test.py: This has the model-inference code.
+8. utils/lr_find.py: This has the LR-rate finder code esp for the code to enable LR-range test (as required for OCP policy)
+9. utils/misc.py: This has miscellaneous other funtions to plot curves (accuracy/loss, L1-penalty, misclassified with without grad-cam display etc.
+
+The downloaded datset or any other intermediate plots or config.txt files are saved to the ./data (or 
+user-provided folder)
+The models are saved to the ./saved_models (or user-provided folder)
+```
+
  *   Create:
 models folder - this is where you'll add all of your future models. 
 
