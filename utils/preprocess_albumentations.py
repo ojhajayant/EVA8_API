@@ -13,6 +13,7 @@ import numpy as np
 import torch
 from albumentations import Compose, RandomCrop, HorizontalFlip, Normalize
 from albumentations import CoarseDropout, PadIfNeeded, ShiftScaleRotate
+from albumentations.augmentations.crops.transforms import RandomSizedCrop
 from albumentations.pytorch.transforms import ToTensorV2
 from torchvision import datasets
 
@@ -37,16 +38,17 @@ class album_Compose:
                 PadIfNeeded(min_height= img_size[0] + img_size[0] // 4,
                             min_width= img_size[1] + img_size[1] // 4,
                             ),
-                RandomCrop(height=32, width=32, always_apply=True),
+                RandomSizedCrop((img_size[0],img_size[1]), img_size[0],img_size[1]),
+                # RandomCrop(height=32, width=32, always_apply=True),
                 HorizontalFlip(p=0.5),
-                ShiftScaleRotate(shift_limit=0.05, scale_limit=0.1,
-                                 rotate_limit=10,
-                                 border_mode=cv2.BORDER_CONSTANT, value=0),
-                CoarseDropout(max_holes=1, max_height=img_size[0] // 2,
-                              max_width=img_size[1] // 2,
-                              min_height=img_size[0] // 2,
-                              min_width=img_size[1] // 2,
-                              always_apply=False, p=0.5,
+#                 ShiftScaleRotate(shift_limit=0.05, scale_limit=0.1,
+#                                  rotate_limit=10,
+#                                  border_mode=cv2.BORDER_CONSTANT, value=0),
+                CoarseDropout(max_holes=1, max_height=img_size[0] // 4,
+                              max_width=img_size[1] // 4,
+                              min_height=img_size[0] // 4,
+                              min_width=img_size[1] // 4,
+                              always_apply=False, p=0.75,
                               fill_value=tuple([x * 255.0 for x in mean])),
                 Normalize(mean=mean, std=std, always_apply=True),
                 ToTensorV2(),
