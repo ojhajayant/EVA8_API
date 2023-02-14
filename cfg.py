@@ -66,7 +66,7 @@ def get_args():
                         help='L1-penalty value')
     parser.add_argument('--l2_weight_decay', default=0.0002125, type=float,
                         help='L2-penalty/weight_decay value')
-    parser.add_argument('--L1', default=True, type=bool,
+    parser.add_argument('--L1', default=False, type=bool,
                         help='L1-penalty to be used or not?')
     parser.add_argument('--L2', default=False, type=bool,
                         help='L2-penalty/weight_decay to be used or not?')
