@@ -370,7 +370,8 @@ def main_session_8_custom_net():
         misc.show_gradcam_mislabelled(model, device, x_test,
                                       y_test.reshape(-1, 1), y_pred,
                                       test_dataset, mean_tuple,
-                                      std_tuple, layer='layer3')
+                                      std_tuple, layer='layer3',
+                                      title_str='GradCam on Mis-Classified')
 
         
 if __name__ == '__main__':
