@@ -8,6 +8,7 @@ import os
 import sys
 
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 
 import cfg
@@ -22,7 +23,7 @@ args = get_args()
 file_path = args.data
 
 
-def test(model, device, test_loader, optimizer, epoch):
+def test(model, device, test_loader, optimizer, epoch, criterion):
     """
     main test code
     """
@@ -36,8 +37,7 @@ def test(model, device, test_loader, optimizer, epoch):
         for data, target in test_loader:
             data, target = data.to(device), target.to(device)
             output = model(data)
-            test_loss += F.nll_loss(output, target,
-                                    reduction='sum').item()  # sum up batch loss
+            test_loss += criterion(output, target).item()  # sum up batch loss
             pred = output.argmax(dim=1,
                                  keepdim=True)  # get the index of the max
             # log-probability

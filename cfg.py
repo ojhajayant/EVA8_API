@@ -36,26 +36,30 @@ def get_args():
                         help='Dataset--CIFAR10, MNIST, or...')
     parser.add_argument('--img_size', '-I', default=(32, 32), type=tuple,
                         help='Image Size')
-    parser.add_argument('--batch_size', '-b', default=128, type=int,
+    parser.add_argument('--batch_size', '-b', default=512, type=int,
                         help='batch size')
-    parser.add_argument('--epochs', '-e', default=20, type=int,
+    parser.add_argument('--epochs', '-e', default=24, type=int,
                         help='training epochs')
     # Below (lr=0.01) was the default for the custom model architecture used for S7
     # parser.add_argument('--lr', default=0.01, type=float, help='learning rate')
-    # Below (lr=0.0006) was the default for the ResNet18 used for S8
-    parser.add_argument('--criterion', default=nn.NLLLoss(),
+    # Below (lr=0.0006) was the default for the ResNet18 used for S8 
+    parser.add_argument('--criterion', default=nn.CrossEntropyLoss(),
                         type=nn.modules.loss._Loss,
                         help='The loss function to be used during training')
     parser.add_argument('--init_lr', default=1e-4, type=float,
                         help='lr lower range value used for the LR-range-test')
-    parser.add_argument('--end_lr', default=0.05, type=float,
+    parser.add_argument('--end_lr', default=0.1, type=float,
                         help='lr upper range value used for the LR-range-test')
-    parser.add_argument('--lr_range_test_epochs', '-E', default=100, type=int,
+    parser.add_argument('--max_lr_epochs', '-M', default=5, type=int,
+                        help='at what epoch Max LR should reach?')
+    parser.add_argument('--lr_range_test_epochs', '-E', default=150, type=int,
                         help='epoch value used for the LR-range-test')
-    parser.add_argument('--best_lr', default=0.504999999999, type=float,
+    parser.add_argument('--best_lr', default=0.03, type=float,
                         help='best_lr obtained from the LR-range-test')
     parser.add_argument('--cycle_momentum', default=True, type=bool,
                         help='Make cyclic changes to momentum value during OCP?')
+    parser.add_argument('--div_factor', '-f', default=10, type=int,
+                        help='OCP div factor')
     parser.add_argument('--optimizer', default=optim.SGD, type=type(optim.SGD),
                         help='The optimizer to be used during training')
     parser.add_argument('--cuda', default=torch.cuda.is_available(), type=bool,
@@ -66,7 +70,7 @@ def get_args():
                         help='L1-penalty value')
     parser.add_argument('--l2_weight_decay', default=0.0002125, type=float,
                         help='L2-penalty/weight_decay value')
-    parser.add_argument('--L1', default=False, type=bool,
+    parser.add_argument('--L1', default=True, type=bool,
                         help='L1-penalty to be used or not?')
     parser.add_argument('--L2', default=False, type=bool,
                         help='L2-penalty/weight_decay to be used or not?')
@@ -90,5 +94,8 @@ train_losses = []
 test_losses = []
 train_acc = []
 test_acc = []
+train_acc_calc = []
+lr_range_test_acc = []
+lr_range_test_lr = []
 momentum_values = []
 learning_rate_values = []

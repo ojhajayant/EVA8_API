@@ -12,7 +12,8 @@ import cv2
 import numpy as np
 import torch
 from albumentations import Compose, RandomCrop, HorizontalFlip, Normalize
-from albumentations import CoarseDropout, PadIfNeeded, ShiftScaleRotate
+from albumentations import CoarseDropout, PadIfNeeded, ShiftScaleRotate, RandomBrightness, RandomContrast
+from albumentations.augmentations.transforms import HueSaturationValue
 from albumentations.augmentations.crops.transforms import RandomSizedCrop
 from albumentations.pytorch.transforms import ToTensorV2
 from torchvision import datasets
@@ -37,19 +38,25 @@ class album_Compose:
             self.albumentations_transform = Compose([
                 PadIfNeeded(min_height= img_size[0] + img_size[0] // 4,
                             min_width= img_size[1] + img_size[1] // 4,
-                            ),
-                RandomSizedCrop((img_size[0],img_size[1]), img_size[0],img_size[1]),
-                # RandomCrop(height=32, width=32, always_apply=True),
+                            border_mode=cv2.BORDER_WRAP,
+                            always_apply=True, p=1.0),
+                RandomSizedCrop((img_size[0],img_size[1]), img_size[0],img_size[1],
+                                always_apply=True,
+                                p=1.0),
                 HorizontalFlip(p=0.5),
-#                 ShiftScaleRotate(shift_limit=0.05, scale_limit=0.1,
-#                                  rotate_limit=10,
-#                                  border_mode=cv2.BORDER_CONSTANT, value=0),
+                ShiftScaleRotate(shift_limit=0.1, 
+                                 scale_limit=0.2,
+                                 rotate_limit=10,
+                                 border_mode=cv2.BORDER_WRAP),
                 CoarseDropout(max_holes=1, max_height=img_size[0] // 4,
                               max_width=img_size[1] // 4,
                               min_height=img_size[0] // 4,
                               min_width=img_size[1] // 4,
-                              always_apply=False, p=0.75,
+                              always_apply=False, p=0.65,
                               fill_value=tuple([x * 255.0 for x in mean])),
+#                 HueSaturationValue(hue_shift_limit=10, sat_shift_limit=15, val_shift_limit=1, p=0.5),
+#                 RandomBrightness(limit=0.1, p=0.5),
+#                 RandomContrast(limit=0.07, p=0.5),
                 Normalize(mean=mean, std=std, always_apply=True),
                 ToTensorV2(),
 

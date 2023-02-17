@@ -12,7 +12,7 @@ import cv2
 import matplotlib
 # matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from IPython.display import display
+# from IPython.display import display
 import numpy as np
 import torch
 import torch.nn.functional as F
@@ -59,17 +59,17 @@ def plot_train_samples(train_loader, batch_size):
         im = features_idx[img_num]
         ax.set_title(train_loader.dataset.classes[i])
         plt.imshow(im)
-        plt.savefig('plot2.png')
-        from IPython.display import Image
-        Image(filename='plot2.png')
-        display(plt.gcf())
-        if not args.IPYNB_ENV:
-            plt.savefig(filepath)
+        #plt.savefig('plot2.png')
+        #from IPython.display import Image
+        #Image(filename='plot2.png')
+        #display(plt.gcf())
+        #if not args.IPYNB_ENV:
+            #plt.savefig(filepath)
     if args.IPYNB_ENV:
-        plt.savefig('plot3.png')
-        from IPython.display import Image
-        Image(filename='plot3.png')
-        display(plt.gcf())
+        #plt.savefig('plot3.png')
+        #from IPython.display import Image
+        #Image(filename='plot3.png')
+        #display(plt.gcf())
         plt.show()
     print("Here are a few samples AFTER TRANSFORMS APPLIED:")
     batch = next(iter(train_loader))
@@ -77,10 +77,10 @@ def plot_train_samples(train_loader, batch_size):
     grid = torchvision.utils.make_grid(images, nrow=batch_size // 8)
     plt.figure(figsize=(25, 25))
     plt.imshow(np.transpose(grid, (1, 2, 0)))
-    plt.savefig('plot4.png')
-    from IPython.display import Image
-    Image(filename='plot4.png')
-    display(plt.gcf())
+    #plt.savefig('plot4.png')
+    #from IPython.display import Image
+    #Image(filename='plot4.png')
+    #display(plt.gcf())
     plt.show()
 
 
@@ -161,22 +161,22 @@ def display_mislabelled(model, device, x_test, y_test, y_pred, test_dataset,
                 ax.set_title('Act:{} '.format(
                     test_dataset.classes[int(i)]) + ' Pred:{} '.format(
                     test_dataset.classes[int(y_pred[intsct[img_num]][0])]),
-                             fontsize=8)
+                             fontsize=11)
             elif args.dataset == 'MNIST':
                 ax.set_title('Act:{} '.format(i) + ' Pred:{} '.format(
                     int(y_pred[intsct[img_num]][0])), fontsize=8)
             plt.imshow(im)
-            plt.savefig('plot5.png')
-            from IPython.display import Image
-            Image(filename='plot5.png')
-            display(plt.gcf())
+            #plt.savefig('plot5.png')
+            #from IPython.display import Image
+            #Image(filename='plot5.png')
+            #display(plt.gcf())
             if not args.IPYNB_ENV:
                 plt.savefig(filepath)
     if args.IPYNB_ENV:
-        plt.savefig('plot6.png')
-        from IPython.display import Image
-        Image(filename='plot6.png')
-        display(plt.gcf())
+        #plt.savefig('plot6.png')
+        #from IPython.display import Image
+        #Image(filename='plot6.png')
+        #display(plt.gcf())
         plt.show()
 
 
@@ -240,10 +240,10 @@ def plot_acc():
     _ = plt.ylabel('accuracy')
     _ = plt.xlabel('epoch')
     _ = plt.legend(['train', 'val'], loc='upper left')
-    plt.savefig('plot7.png')
-    from IPython.display import Image
-    Image(filename='plot7.png')
-    display(plt.gcf())
+    #plt.savefig('plot7.png')
+    #from IPython.display import Image
+    #Image(filename='plot7.png')
+    #display(plt.gcf())
     _ = plt.show()
 
 
@@ -257,10 +257,10 @@ def plot_momentum_lr():
     _ = plt.ylabel('Value')
     _ = plt.xlabel('Batch')
     _ = plt.legend(['Momentum', 'Learning Rate'], loc='upper left')
-    plt.savefig('plot8.png')
-    from IPython.display import Image
-    Image(filename='plot8.png')
-    display(plt.gcf())
+    #plt.savefig('plot8.png')
+    #from IPython.display import Image
+    #Image(filename='plot8.png')
+    #display(plt.gcf())
     _ = plt.show()
 
 
@@ -286,10 +286,6 @@ def plot_acc_loss():
     if not args.IPYNB_ENV:
         fig.savefig(filepath)
     else:
-        plt.savefig('plot9.png')
-        from IPython.display import Image
-        Image(filename='plot9.png')
-        display(plt.gcf())
         fig.show()
 
 
@@ -359,34 +355,34 @@ def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
                     _ = ax.set_title('Act:{} '.format(
                         test_dataset.classes[int(i)]) + ' Pred:{} '.format(
                         test_dataset.classes[int(y_pred[intsct[img_num]][0])]),
-                                     fontsize=8)
+                                     fontsize=11)
                 elif args.dataset == 'MNIST':
                     _ = ax.set_title('Act:{} '.format(i) + ' Pred:{} '.format(
                         int(y_pred[intsct[img_num]][0])),
-                                     fontsize=8)
+                                     fontsize=11)
                 if j == 0:
                     im_orig = im_orig.permute(0, 2, 3, 1).squeeze().numpy()
                     _ = ax.imshow(np.clip(im_orig, 0, 1))
-                    plt.savefig('plot10.png')
-                    display(plt.gcf())
-                    from IPython.display import Image
-                    Image(filename='plot10.png')
-                    display(plt.gcf())
+                    #plt.savefig('plot10.png')
+                    #display(plt.gcf())
+                    #from IPython.display import Image
+                    #Image(filename='plot10.png')
+                    #display(plt.gcf())
                 else:
                     super_imposed_img = superimpose(im_orig, heatmap)
                     _ = ax.imshow(super_imposed_img)
-                    plt.savefig('plot11.png')
-                    from IPython.display import Image
-                    Image(filename='plot11.png')
-                    display(plt.gcf())
+                    #plt.savefig('plot11.png')
+                    #from IPython.display import Image
+                    #Image(filename='plot11.png')
+                    #display(plt.gcf())
                 _ = fig.add_subplot(ax)
         if not args.IPYNB_ENV:
             fig.show()
-            fig.savefig(filepath)
+            #fig.savefig(filepath)
         else:
             fig.show()
-    plt.savefig('plot12.png')
-    from IPython.display import Image
-    Image(filename='plot12.png')
-    display(plt.gcf())
+    #plt.savefig('plot12.png')
+    #from IPython.display import Image
+    #Image(filename='plot12.png')
+    #display(plt.gcf())
     plt.show()
