@@ -197,6 +197,9 @@ def main_session_7_resnet():
                                  y_pred, test_dataset,
                                  title_str='Predicted Vs Actual')
         x_test = torch.from_numpy(x_test)
+        
+        print(
+            "The mis-classified images with GradCam, for this model are as shown below:")
 
         misc.show_gradcam_mislabelled(model, device, x_test,
                                       y_test.reshape(-1, 1), y_pred,
