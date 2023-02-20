@@ -45,7 +45,7 @@ class album_Compose:
                                 img_size[1],
                                 always_apply=True,
                                 p=1.0),
-                HorizontalFlip(p=0.4),
+                HorizontalFlip(p=0.35),
 #                 ShiftScaleRotate(shift_limit=0.1,
 #                                  scale_limit=0.2,
 #                                  rotate_limit=10,
