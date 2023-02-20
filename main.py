@@ -375,4 +375,5 @@ if __name__ == '__main__':
         warnings.simplefilter("ignore")
     args = cfg.get_args()
     main_session_8_custom_net()
+    
     # main_session_7_resnet()
