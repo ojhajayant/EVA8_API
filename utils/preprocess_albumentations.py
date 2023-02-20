@@ -54,7 +54,7 @@ class album_Compose:
                               max_width=img_size[1] // 4,
                               min_height=img_size[0] // 4,
                               min_width=img_size[1] // 4,
-                              always_apply=False, p=0.75,
+                              always_apply=False, p=0.70,
                               fill_value=tuple([x * 255.0 for x in mean])),
                 Normalize(mean=mean, std=std, always_apply=True),
                 ToTensorV2(),
