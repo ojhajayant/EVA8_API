@@ -15,12 +15,17 @@ import matplotlib.pyplot as plt
 # from IPython.display import display
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.nn.functional as F
 import torchvision
 from sklearn.metrics import confusion_matrix, classification_report
 from torch.autograd import Variable
 from torchvision import transforms
 from pytorch_grad_cam import GradCAM
+from pytorch_grad_cam.utils.model_targets import ClassifierOutputTarget
+from pytorch_grad_cam.utils.image import show_cam_on_image
+from functools import reduce
+from typing import Union
 
 import cfg
 
@@ -59,17 +64,17 @@ def plot_train_samples(train_loader, batch_size):
         im = features_idx[img_num]
         ax.set_title(train_loader.dataset.classes[i])
         plt.imshow(im)
-        #plt.savefig('plot2.png')
-        #from IPython.display import Image
-        #Image(filename='plot2.png')
-        #display(plt.gcf())
-        #if not args.IPYNB_ENV:
-            #plt.savefig(filepath)
+        # plt.savefig('plot2.png')
+        # from IPython.display import Image
+        # Image(filename='plot2.png')
+        # display(plt.gcf())
+        # if not args.IPYNB_ENV:
+        # plt.savefig(filepath)
     if args.IPYNB_ENV:
-        #plt.savefig('plot3.png')
-        #from IPython.display import Image
-        #Image(filename='plot3.png')
-        #display(plt.gcf())
+        # plt.savefig('plot3.png')
+        # from IPython.display import Image
+        # Image(filename='plot3.png')
+        # display(plt.gcf())
         plt.show()
     print("Here are a few samples AFTER TRANSFORMS APPLIED:")
     batch = next(iter(train_loader))
@@ -77,10 +82,10 @@ def plot_train_samples(train_loader, batch_size):
     grid = torchvision.utils.make_grid(images, nrow=batch_size // 8)
     plt.figure(figsize=(25, 25))
     plt.imshow(np.transpose(grid, (1, 2, 0)))
-    #plt.savefig('plot4.png')
-    #from IPython.display import Image
-    #Image(filename='plot4.png')
-    #display(plt.gcf())
+    # plt.savefig('plot4.png')
+    # from IPython.display import Image
+    # Image(filename='plot4.png')
+    # display(plt.gcf())
     plt.show()
 
 
@@ -166,17 +171,17 @@ def display_mislabelled(model, device, x_test, y_test, y_pred, test_dataset,
                 ax.set_title('Act:{} '.format(i) + ' Pred:{} '.format(
                     int(y_pred[intsct[img_num]][0])), fontsize=8)
             plt.imshow(im)
-            #plt.savefig('plot5.png')
-            #from IPython.display import Image
-            #Image(filename='plot5.png')
-            #display(plt.gcf())
+            # plt.savefig('plot5.png')
+            # from IPython.display import Image
+            # Image(filename='plot5.png')
+            # display(plt.gcf())
             if not args.IPYNB_ENV:
                 plt.savefig(filepath)
     if args.IPYNB_ENV:
-        #plt.savefig('plot6.png')
-        #from IPython.display import Image
-        #Image(filename='plot6.png')
-        #display(plt.gcf())
+        # plt.savefig('plot6.png')
+        # from IPython.display import Image
+        # Image(filename='plot6.png')
+        # display(plt.gcf())
         plt.show()
 
 
@@ -240,10 +245,10 @@ def plot_acc():
     _ = plt.ylabel('accuracy')
     _ = plt.xlabel('epoch')
     _ = plt.legend(['train', 'val'], loc='upper left')
-    #plt.savefig('plot7.png')
-    #from IPython.display import Image
-    #Image(filename='plot7.png')
-    #display(plt.gcf())
+    # plt.savefig('plot7.png')
+    # from IPython.display import Image
+    # Image(filename='plot7.png')
+    # display(plt.gcf())
     _ = plt.show()
 
 
@@ -257,10 +262,10 @@ def plot_momentum_lr():
     _ = plt.ylabel('Value')
     _ = plt.xlabel('Batch')
     _ = plt.legend(['Momentum', 'Learning Rate'], loc='upper left')
-    #plt.savefig('plot8.png')
-    #from IPython.display import Image
-    #Image(filename='plot8.png')
-    #display(plt.gcf())
+    # plt.savefig('plot8.png')
+    # from IPython.display import Image
+    # Image(filename='plot8.png')
+    # display(plt.gcf())
     _ = plt.show()
 
 
@@ -296,13 +301,24 @@ def write(dic, path):
         f.write(json.dumps(dic))
 
 
-def superimpose(original_img, heatmap):
-    heatmap = cv2.applyColorMap(np.uint8(255 * heatmap), cv2.COLORMAP_JET)
-    heatmap = np.float32(heatmap) / 255
-    cam = heatmap + np.float32(original_img)
-    cam = cam / np.max(cam)
-    cam = np.clip(cam, 0, 1)
-    return np.uint8(255 * cam)
+def get_module_by_name(module: Union[torch.Tensor, nn.Module],
+                       access_string: str):
+    """Retrieve a module nested in another by its access string.
+    Works even when there is a Sequential in the module.
+    """
+    names = access_string.split(sep='.')
+    return reduce(getattr, names, module)
+
+
+def denormalize(img, mean_tuple, std_tuple):
+    mean = mean_tuple
+    std = std_tuple
+    img = img.astype(dtype=np.float32)
+
+    for i in range(img.shape[0]):
+        img[i] = (img[i] * std[i]) + mean[i]
+
+    return np.transpose(img, (1, 2, 0))
 
 
 def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
@@ -340,13 +356,15 @@ def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
             img_num = np.random.randint(features_idx.shape[0])
             im_orig = features_idx[img_num].numpy()
             im_orig = preprocess(im_orig).unsqueeze(0)
+            rgb_img = denormalize(im_orig.cpu().numpy().squeeze(), mean_tuple, std_tuple )
             model.eval()
             # Instantiate GradCAM
             layer_names = [layer]
             layers = [model._modules[name] for name in layer_names]
             gradcam = GradCAM(model=model, target_layers=layers, use_cuda=True)
             cam = gradcam(im_orig)
-            heatmap = cam[0]
+            cam = cam[0, :]
+            heatmap = show_cam_on_image(rgb_img, cam, use_rgb=True)
             for j in range(2):
                 ax = plt.Subplot(fig, inner[j])
                 ax.get_xaxis().set_visible(False)
@@ -363,26 +381,11 @@ def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
                 if j == 0:
                     im_orig = im_orig.permute(0, 2, 3, 1).squeeze().numpy()
                     _ = ax.imshow(np.clip(im_orig, 0, 1))
-                    #plt.savefig('plot10.png')
-                    #display(plt.gcf())
-                    #from IPython.display import Image
-                    #Image(filename='plot10.png')
-                    #display(plt.gcf())
                 else:
-                    super_imposed_img = superimpose(im_orig, heatmap)
-                    _ = ax.imshow(super_imposed_img)
-                    #plt.savefig('plot11.png')
-                    #from IPython.display import Image
-                    #Image(filename='plot11.png')
-                    #display(plt.gcf())
+                    _ = ax.imshow(heatmap)
                 _ = fig.add_subplot(ax)
         if not args.IPYNB_ENV:
             fig.show()
-            #fig.savefig(filepath)
         else:
             fig.show()
-    #plt.savefig('plot12.png')
-    #from IPython.display import Image
-    #Image(filename='plot12.png')
-    #display(plt.gcf())
     plt.show()
