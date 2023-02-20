@@ -669,7 +669,7 @@ def find_network_lr(model, criterion, device, lr_find_loader, init_lr,
     print("num_iter", num_iter)
     lr_finder = LRFinder(test_model, optimizer, criterion, device=device)
     lr_finder.range_test(lr_find_loader, end_lr=end_lr, num_iter=num_iter,
-                         step_mode='linear', start_lr=init_lr)
+                         step_mode='exp', start_lr=init_lr)
     min_val_index = lr_finder.history['loss'].index(min(lr_finder.history['loss']))
     best_lr = lr_finder.history['lr'][min_val_index]
     print(
