@@ -76,17 +76,18 @@ def plot_train_samples(train_loader, batch_size):
         # Image(filename='plot3.png')
         # display(plt.gcf())
         plt.show()
-    print("Here are a few samples AFTER TRANSFORMS APPLIED:")
-    batch = next(iter(train_loader))
-    images, labels = batch
-    grid = torchvision.utils.make_grid(images, nrow=batch_size // 8)
-    plt.figure(figsize=(25, 25))
-    plt.imshow(np.transpose(grid, (1, 2, 0)))
-    # plt.savefig('plot4.png')
-    # from IPython.display import Image
-    # Image(filename='plot4.png')
-    # display(plt.gcf())
-    plt.show()
+    if args.cmd != 'lr_find':
+        print("Here are a few samples AFTER TRANSFORMS APPLIED:")
+        batch = next(iter(train_loader))
+        images, labels = batch
+        grid = torchvision.utils.make_grid(images, nrow=batch_size // 8)
+        plt.figure(figsize=(25, 25))
+        plt.imshow(np.transpose(grid, (1, 2, 0)))
+        # plt.savefig('plot4.png')
+        # from IPython.display import Image
+        # Image(filename='plot4.png')
+        # display(plt.gcf())
+        plt.show()
 
 
 def l1_penalty(x):
