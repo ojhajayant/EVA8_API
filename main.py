@@ -326,7 +326,8 @@ def main_session_8_custom_net():
                             "anneal_strategy": "linear",
                             "div_factor": DIV_FACTOR,
                             "final_div_factor": FINAL_DIV_FACTOR,
-                            "cycle_momentum": CYCLE_MOMENTUM}
+                            "cycle_momentum": CYCLE_MOMENTUM,
+                            "three_phase": False}
         optimizer = optim.SGD(model.parameters(), **optim_params)
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,
                                                         **scheduler_params)
