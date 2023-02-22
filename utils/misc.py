@@ -284,7 +284,8 @@ def plot_acc_loss():
     trn_loss= [t.cpu().item() for t in cfg.train_losses]
     axs[0, 0].plot(trn_loss)
     axs[0, 0].set_title("Training Loss")
-    axs[1, 0].plot(cfg.train_acc[4000:])
+#     axs[1, 0].plot(cfg.train_acc[4000:])
+    axs[1, 0].plot(cfg.train_acc)
     axs[1, 0].set_title("Training Accuracy")
     axs[0, 1].plot(cfg.test_losses)
     axs[0, 1].set_title("Test Loss")
