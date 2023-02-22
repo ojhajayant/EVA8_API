@@ -518,8 +518,10 @@ def main_session_9_ultimus():
         model_name = args.best_model
         print("Loaded the best model: {} from last training session".format(
             model_name))
-        model = misc.load_model(custom_resnet.custom_resnet(10), device,
-                                model_name=model_name)
+        model = misc.load_model(
+            EVA8_session9_assignment_model.EVA8_session9_assignment_model(),
+            device,
+            model_name=model_name)
         y_test = np.array(test_dataset.targets)
         print(
             "The confusion-matrix and classification-report for this model are:")
@@ -528,12 +530,12 @@ def main_session_9_ultimus():
         misc.display_mislabelled(model, device, x_test, y_test.reshape(-1, 1),
                                  y_pred, test_dataset,
                                  title_str='Predicted Vs Actual')
-        x_test = torch.from_numpy(x_test)
-
-        misc.show_gradcam_mislabelled(model, device, x_test,
-                                      y_test.reshape(-1, 1), y_pred,
-                                      test_dataset, mean_tuple,
-                                      std_tuple, layer='layer3')
+        # x_test = torch.from_numpy(x_test)
+        #
+        # misc.show_gradcam_mislabelled(model, device, x_test,
+        #                               y_test.reshape(-1, 1), y_pred,
+        #                               test_dataset, mean_tuple,
+        #                               std_tuple, layer='layer3')
 
 
 if __name__ == '__main__':
