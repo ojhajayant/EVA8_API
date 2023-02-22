@@ -67,8 +67,9 @@ def train(model, device, train_loader, optimizer, epoch, criterion,
         if scheduler is not None:
             scheduler.step()
         # Capture the momentum and learning rate values
-        if optimizer.param_groups[0]['momentum'] is not None:
-            cfg.momentum_values.append(optimizer.param_groups[0]['momentum'])
+        if args.optimizer != optim.Adam:
+            if optimizer.param_groups[0]['momentum'] is not None:
+                cfg.momentum_values.append(optimizer.param_groups[0]['momentum'])
         cfg.learning_rate_values.append(optimizer.param_groups[0]['lr'])
         # Update pbar-tqdm
         pred = y_pred.argmax(dim=1, keepdim=True)  # get the index of the max
