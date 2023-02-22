@@ -433,7 +433,7 @@ def main_session_9_ultimus():
 
     criterion = args.criterion  # nn.NLLLoss()
 
-    optimizer = args.optimizer
+    optimizer = optim.Adam
 
     device = torch.device("cuda" if args.cuda else "cpu")
     print(device)
@@ -465,10 +465,6 @@ def main_session_9_ultimus():
         print("Model training starts on {} dataset".format(args.dataset))
         best_lr = args.best_lr
 
-        # Setup optimizer & scheduler parameters for OCP
-        CYCLE_MOMENTUM = args.cycle_momentum  # If True, momentum value cycles
-        # from base_momentum of 0.85 to max_momentum of 0.95 during OCP cycle
-        MOMENTUM = 0.9
         WEIGHT_DECAY = weight_decay
         DIV_FACTOR = args.div_factor  # default 10
         # final_div_factor = div_factor for NO annihilation
@@ -483,7 +479,6 @@ def main_session_9_ultimus():
 
         # Initialize optimizer and scheduler parameters
         optim_params = {"lr": LRMIN,
-                        "momentum": MOMENTUM,
                         "weight_decay": WEIGHT_DECAY}
         scheduler_params = {"max_lr": LRMAX,
                             "steps_per_epoch": NUM_OF_BATCHES,
@@ -491,9 +486,8 @@ def main_session_9_ultimus():
                             "pct_start": PCT_START,
                             "anneal_strategy": "linear",
                             "div_factor": DIV_FACTOR,
-                            "final_div_factor": FINAL_DIV_FACTOR,
-                            "cycle_momentum": CYCLE_MOMENTUM}
-        optimizer = optim.SGD(model.parameters(), **optim_params)
+                            "final_div_factor": FINAL_DIV_FACTOR}
+        optimizer = optim.Adam(model.parameters(), **optim_params)
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,
                                                         **scheduler_params)
         last_best = ''
@@ -511,7 +505,8 @@ def main_session_9_ultimus():
             model_name = test.test(model, device, test_loader, optimizer, epoch,
                                    criterion)
             last_best = last_best if (model_name == '') else model_name
-        misc.plot_momentum_lr()
+        # misc.plot_momentum_lr()
+        misc.plot_acc_loss()
         misc.plot_acc()
     elif args.cmd == 'test':
         print("Model inference starts on {}  dataset".format(args.dataset))
