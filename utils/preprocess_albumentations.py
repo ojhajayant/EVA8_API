@@ -46,7 +46,7 @@ class album_Compose:
                                 always_apply=True,
                                 p=1.0),
                 HorizontalFlip(p=0.45),
-                ShiftScaleRotate(shift_limit=0.2,
+                ShiftScaleRotate(shift_limit=0.07,
                                  scale_limit=0.2,
                                  rotate_limit=15,
                                  border_mode=cv2.BORDER_WRAP),
