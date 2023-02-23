@@ -48,11 +48,11 @@ def get_args():
                         help='The loss function to be used during training')
     parser.add_argument('--init_lr', default=1e-4, type=float,
                         help='lr lower range value used for the LR-range-test')
-    parser.add_argument('--end_lr', default=0.1, type=float,
+    parser.add_argument('--end_lr', default=1, type=float,
                         help='lr upper range value used for the LR-range-test')
     parser.add_argument('--max_lr_epochs', '-M', default=5, type=int,
                         help='at what epoch Max LR should reach?')
-    parser.add_argument('--lr_range_test_epochs', '-E', default=150, type=int,
+    parser.add_argument('--lr_range_test_epochs', '-E', default=10, type=int,
                         help='epoch value used for the LR-range-test')
     parser.add_argument('--best_lr', default=0.03, type=float,
                         help='best_lr obtained from the LR-range-test')
@@ -60,8 +60,10 @@ def get_args():
                         help='Make cyclic changes to momentum value during OCP?')
     parser.add_argument('--div_factor', '-f', default=10, type=int,
                         help='OCP div factor')
-    parser.add_argument('--optimizer', default=optim.Adam, type=type(optim.Adam),
-                        help='The optimizer to be used during training')
+#     parser.add_argument('--optimizer', default=optim.Adam, type=type(optim.Adam),
+#                         help='The optimizer to be used during training')
+    parser.add_argument('--optimizer', default=optim.SGD, type=type(optim.SGD),
+                        help='The optimizer to be used during training') 
     parser.add_argument('--cuda', default=torch.cuda.is_available(), type=bool,
                         help='use gpu or not')
     parser.add_argument('--dropout', '-d', default=0.08, type=float,
