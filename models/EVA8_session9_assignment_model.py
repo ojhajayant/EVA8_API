@@ -41,8 +41,9 @@ class ULTIMUS(nn.Module):
         k = self.K(x)
         q = self.Q(x)
         v = self.V(x)
-        am = F.softmax(torch.matmul(q, k.t()) / (8 ** 0.5),
-                       dim=-1)
+#         am = F.softmax(torch.matmul(q, k.t()) / (8 ** 0.5),
+#                        dim=-1)
+        am = F.softmax(torch.matmul(q, k.t()), dim=-1) / (8 ** 0.5)
         z = torch.matmul(am, v)
         out = self.OUT(z)
         out = out + x  # Add skip connection
