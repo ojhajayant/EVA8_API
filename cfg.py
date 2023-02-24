@@ -60,10 +60,10 @@ def get_args():
                         help='Make cyclic changes to momentum value during OCP?')
     parser.add_argument('--div_factor', '-f', default=10, type=int,
                         help='OCP div factor')
-#     parser.add_argument('--optimizer', default=optim.Adam, type=type(optim.Adam),
-#                         help='The optimizer to be used during training')
-    parser.add_argument('--optimizer', default=optim.SGD, type=type(optim.SGD),
-                        help='The optimizer to be used during training') 
+    parser.add_argument('--optimizer', default=optim.Adam, type=type(optim.Adam),
+                        help='The optimizer to be used during training')
+#     parser.add_argument('--optimizer', default=optim.SGD, type=type(optim.SGD),
+#                         help='The optimizer to be used during training') 
     parser.add_argument('--cuda', default=torch.cuda.is_available(), type=bool,
                         help='use gpu or not')
     parser.add_argument('--dropout', '-d', default=0.08, type=float,
