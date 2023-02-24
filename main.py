@@ -522,9 +522,9 @@ def main_session_9_ultimus():
             "The confusion-matrix and classification-report for this model are:")
         y_pred = misc.model_pred(model, device, y_test, test_dataset)
         x_test = test_dataset.data
-#         misc.display_mislabelled(model, device, x_test, y_test.reshape(-1, 1),
-#                                  y_pred, test_dataset,
-#                                  title_str='Predicted Vs Actual')
+        misc.display_mislabelled(model, device, x_test, y_test.reshape(-1, 1),
+                                 y_pred, test_dataset,
+                                 title_str='Predicted Vs Actual')
         # x_test = torch.from_numpy(x_test)
         #
         # misc.show_gradcam_mislabelled(model, device, x_test,
