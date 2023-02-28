@@ -26,8 +26,7 @@ import torch.optim as optim
 from torchsummary import summary
 
 import cfg
-from models import resnet18, custom_resnet, EVA8_session9_assignment_model, \
-    EVA8_session10_assignment_model
+from models import resnet18, custom_resnet, EVA8_session9_assignment_model, vit
 from utils import preprocess
 from utils import preprocess_albumentations
 from utils import test
@@ -603,7 +602,7 @@ def main_session_10_vit():
     print(device)
 
     # Get the model loaded with summary(10 classes)
-    model = EVA8_session10_assignment_model.ViT(image_size=32, patch_size=2,
+    model = vit.ViT(image_size=32, patch_size=2,
                                                 num_classes=10, dim=64,
                                                 depth=4,
                                                 heads=8, mlp_dim=64,
@@ -684,7 +683,7 @@ def main_session_10_vit():
         print("Loaded the best model: {} from last training session".format(
             model_name))
         model = misc.load_model(
-            EVA8_session10_assignment_model.ViT(image_size=32, patch_size=2,
+            vit.ViT(image_size=32, patch_size=2,
                                                 num_classes=10, dim=64,
                                                 depth=4,
                                                 heads=8, mlp_dim=64,
