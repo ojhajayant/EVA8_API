@@ -123,11 +123,11 @@ class ViT(nn.Module):
                         'mean'}, 'pool type must be either cls (cls token) or mean (mean pooling)'
 
         self.to_patch_embedding = nn.Sequential(
-            nn.Conv2d(in_channels, 32, (3, 3), padding=1),
+            nn.Conv2d(in_channels, channels, (3, 3), padding=1),
             nn.GELU(),
-            nn.Conv2d(32, 32, patch_size, stride=patch_size),
+            nn.Conv2d(channels, channels, patch_size, stride=patch_size),
             nn.Flatten(start_dim=2),
-            nn.Conv2d(32, dim, (1, 1)),
+            nn.Conv2d(channels, dim, (1, 1)),
             # Rearrange('b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1=patch_height,
             #           p2=patch_width),
             # nn.Linear(patch_dim, dim),
