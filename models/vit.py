@@ -61,11 +61,20 @@ class Attention(nn.Module):
         self.scale = dim_head ** -0.5
 
         self.attend = nn.Softmax(dim=-1)
-        self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
+        self.to_qkv = nn.Sequential(
+            Rearrange('b c h  -> b h c 1'),
+            nn.Conv2d(dim, inner_dim*3, kernel_size=1, bias=False),
+            nn.Dropout(dropout),
+            nn.GELU(),
+            Rearrange('b c h 1  -> b h c'),
+        )
 
         self.to_out = nn.Sequential(
-            nn.Linear(inner_dim, dim),
-            nn.Dropout(dropout)
+            Rearrange('b c h  -> b h c 1'),
+            nn.Conv2d(inner_dim, dim, kernel_size=1, bias=False),
+            nn.Dropout(dropout),
+            nn.GELU(),
+            Rearrange('b c h 1  -> b h c'),
         ) if project_out else nn.Identity()
 
     def forward(self, x):
