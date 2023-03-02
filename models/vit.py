@@ -118,72 +118,72 @@ class ViT(nn.Module):
                 image_height // patch_height)  # each flattened/composed
         # -patches of  32 channels/num_patches (for ex: 256 here)
         self.to_patch_embedding = nn.Sequential(
-            # Below comments -1 or b (batch_size dimension) are meant.
-            # we want a conversion of input tensor: (-1, 3, 32, 32) to
-            # (-1, 32, dim) for ex: dim = 512 etc. Here in the tensor
-            # size: (-1,32, dim) the num_patches as 32 is the num_channels &
-            # dim (for ex: 512/64 etc.) we extract (preserve) through conv2d
-            # steps as given below:
+        # Below comments -1 or b (batch_size dimension) are meant.
+        # we want a conversion of input tensor: (-1, 3, 32, 32) to
+        # (-1, 32, dim) for ex: dim = 512 etc. Here in the tensor
+        # size: (-1,32, dim) the num_patches as 32 is the num_channels &
+        # dim (for ex: 512/64 etc.) we extract (preserve) through conv2d
+        # steps as given below:
 
-            # ---------------------------------------------------------------
-            # 1st: 32x32x3 |(3x3x3)x32|32x32x32
-            # ---------------------------------------------------------------
-            # 2nd:            GELU
-            # ---------------------------------------------------------------
-            # 3rd: 32x32x32|(2x2x32)x32|16x16x32 (patch_size here being: 2x2)
-            # ---------------------------------------------------------------
-            # 4th:            GELU
-            # ---------------------------------------------------------------
-            # 5th: einops.rearrange(x, 'b c h w -> b c (h w)') (i.e. for ex:
-            # (-1, 32, 16, 16 )-- as obtained in the previous conv2d step
-            # converts to (-1, 32, 256) (i.e. (batch_size, num_patches,
-            # each flattened/composed-patches of  32 channels/num_patches)
-            # ---------------------------------------------------------------
-            # 6th:  einops.rearrange(x, 'b c h -> b h c 1') or x.permute(
-            # 0, 2, 1).unsqueeze(-1) i.e.  permute dimensions and add a new
-            # dimension for next 1x1 conv2d step i.e. after this we have the
-            # tensor size as (-1, 256, 32, 1). Here, effectively we want to
-            # convert the 256 dimension (i.e. the one which was the flattened
-            # content of each patch, out of the 32 channels/patches, as
-            # extracted  from very early conv2d steps) to a desired dimension
-            # (dim) for each transformer block, hence the 256 was taken to
-            # the dimension position of channels as 1x1 and up/down-move it
-            # to any higher/lower (or desired dimension)
-            # ---------------------------------------------------------------
-            # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
-            # i.e. the tensor shape now after this 1x1 conv2d step:
-            # (-1, dim , 32, 1) or for ex: with dim=512: (-1, 512, 32, 1)
-            # ---------------------------------------------------------------
-            # 8th:            GELU
-            # ---------------------------------------------------------------
-            # 9th: einops.rearrange(x, 'b h c 1 -> b c h') or  x.squeeze(
-            # -1).permute(0, 2, 1) or remove last "1" so as to get a
-            # tensor of size (-1, 32, dim) or for ex: for dim=512 (2, 32, 512)
-            # So, finally, we will have the desired:
-            # (-1, number_of_original_extracted_patches, dim) sized tensor
-            # from this "to_patch_embedding" block, which would be compatible
-            # with the given code (https://github.com/lucidrains/vit-pytorch/
-            # blob/main/vit_pytorch/vit.py )
-            # ---------------------------------------------------------------
+        # ---------------------------------------------------------------
+        # 1st: 32x32x3 |(3x3x3)x32|32x32x32
+        # ---------------------------------------------------------------
+        # 2nd:            GELU
+        # ---------------------------------------------------------------
+        # 3rd: 32x32x32|(2x2x32)x32|16x16x32 (patch_size here being: 2x2)
+        # ---------------------------------------------------------------
+        # 4th:            GELU
+        # ---------------------------------------------------------------
+        # 5th: einops.rearrange(x, 'b c h w -> b c (h w)') (i.e. for ex:
+        # (-1, 32, 16, 16 )-- as obtained in the previous conv2d step
+        # converts to (-1, 32, 256) (i.e. (batch_size, num_patches,
+        # each flattened/composed-patches of  32 channels/num_patches)
+        # ---------------------------------------------------------------
+        # 6th:  einops.rearrange(x, 'b c h -> b h c 1') or x.permute(
+        # 0, 2, 1).unsqueeze(-1) i.e.  permute dimensions and add a new
+        # dimension for next 1x1 conv2d step i.e. after this we have the
+        # tensor size as (-1, 256, 32, 1). Here, effectively we want to
+        # convert the 256 dimension (i.e. the one which was the flattened
+        # content of each patch, out of the 32 channels/patches, as
+        # extracted  from very early conv2d steps) to a desired dimension
+        # (dim) for each transformer block, hence the 256 was taken to
+        # the dimension position of channels as 1x1 and up/down-move it
+        # to any higher/lower (or desired dimension)
+        # ---------------------------------------------------------------
+        # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
+        # i.e. the tensor shape now after this 1x1 conv2d step:
+        # (-1, dim , 32, 1) or for ex: with dim=512: (-1, 512, 32, 1)
+        # ---------------------------------------------------------------
+        # 8th:            GELU
+        # ---------------------------------------------------------------
+        # 9th: einops.rearrange(x, 'b h c 1 -> b c h') or  x.squeeze(
+        # -1).permute(0, 2, 1) or remove last "1" so as to get a
+        # tensor of size (-1, 32, dim) or for ex: for dim=512 (2, 32, 512)
+        # So, finally, we will have the desired:
+        # (-1, number_of_original_extracted_patches, dim) sized tensor
+        # from this "to_patch_embedding" block, which would be compatible
+        # with the given code (https://github.com/lucidrains/vit-pytorch/
+        # blob/main/vit_pytorch/vit.py )
+        # ---------------------------------------------------------------
 
-            # 1st: 32x32x3 |(3x3x3)x32|32x32x32
-            nn.Conv2d(in_channels, num_patches, (3, 3), padding=1),
-            # 2nd:            GELU
-            nn.GELU(),
-            # 3rd: 32x32x32|(2x2x32)x32|16x16x32 (patch_size here being: 2x2)
-            nn.Conv2d(num_patches, num_patches, patch_size, stride=patch_size),
-            # 4th:            GELU
-            nn.GELU(),
-            # 5th: einops.rearrange(x, 'b c h w -> b c (h w)')
-            Rearrange('b c h w -> b c (h w)'),
-            # 6th:  einops.rearrange(x, 'b c h -> b h c 1')
-            Rearrange('b c h -> b h c 1'),
-            # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
-            nn.Conv2d(flattened_patch_dim, dim, (1, 1)),
-            # 8th:            GELU
-            nn.GELU(),
-            # 9th: einops.rearrange(x, 'b h c 1 -> b c h')
-            Rearrange('b h c 1 -> b c h'),
+        # 1st: 32x32x3 |(3x3x3)x32|32x32x32
+        nn.Conv2d(in_channels, num_patches, (3, 3), padding=1),
+        # 2nd:            GELU
+        nn.GELU(),
+        # 3rd: 32x32x32|(2x2x32)x32|16x16x32 (patch_size here being: 2x2)
+        nn.Conv2d(num_patches, num_patches, patch_size, stride=patch_size),
+        # 4th:            GELU
+        nn.GELU(),
+        # 5th: einops.rearrange(x, 'b c h w -> b c (h w)')
+        Rearrange('b c h w -> b c (h w)'),
+        # 6th:  einops.rearrange(x, 'b c h -> b h c 1')
+        Rearrange('b c h -> b h c 1'),
+        # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
+        nn.Conv2d(flattened_patch_dim, dim, (1, 1)),
+        # 8th:            GELU
+        nn.GELU(),
+        # 9th: einops.rearrange(x, 'b h c 1 -> b c h')
+        Rearrange('b h c 1 -> b c h'),
         )
 
         self.pos_embedding = nn.Parameter(torch.randn(1, num_patches + 1, dim))
