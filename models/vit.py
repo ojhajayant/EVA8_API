@@ -207,8 +207,10 @@ class ViT(nn.Module):
 
         self.mlp_head = nn.Sequential(
             nn.LayerNorm(dim),
-            nn.Linear(dim, num_classes)
-            # nn.Conv2d(dim, num_classes, kernel_size=1)
+            Rearrange('b c -> b c 1 1'),
+            nn.Conv2d(dim, num_classes, kernel_size=1),
+            nn.GELU(),
+            Rearrange('b c 1 1-> b c'),
         )
 
     def forward(self, img):
@@ -225,4 +227,5 @@ class ViT(nn.Module):
         x = x.mean(dim=1) if self.pool == 'mean' else x[:, 0]
 
         x = self.to_latent(x)
-        return self.mlp_head(x)
+        x = self.mlp_head(x)
+        return x
