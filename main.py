@@ -701,12 +701,18 @@ def main_session_10_vit():
         misc.display_mislabelled(model, device, x_test, y_test.reshape(-1, 1),
                                  y_pred, test_dataset,
                                  title_str='Predicted Vs Actual')
-        # x_test = torch.from_numpy(x_test)
-        #
-        # misc.show_gradcam_mislabelled(model, device, x_test,
-        #                               y_test.reshape(-1, 1), y_pred,
-        #                               test_dataset, mean_tuple,
-        #                               std_tuple, layer='layer3')
+        x_test = torch.from_numpy(x_test)
+        save_dir = os.path.join(os.getcwd(), args.best_model_path)
+        if not os.path.isdir(save_dir):
+            os.makedirs(save_dir)
+        filepath = os.path.join(save_dir, model_name)
+        checkpoint = torch.load(filepath)
+        model.load_state_dict(checkpoint['state_dict'])
+        misc.show_gradcam_mislabelled(model, device, x_test,
+                                      y_test.reshape(-1, 1), y_pred,
+                                      test_dataset, mean_tuple,
+                                      std_tuple, layer=model.mlp_head[2] # the 1x1 convolutional layer
+)
 
 
 if __name__ == '__main__':
