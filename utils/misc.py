@@ -304,13 +304,15 @@ def write(dic, path):
         f.write(json.dumps(dic))
 
 
-def get_module_by_name(module: Union[torch.Tensor, nn.Module],
-                       access_string: str):
-    """Retrieve a module nested in another by its access string.
-    Works even when there is a Sequential in the module.
-    """
-    names = access_string.split(sep='.')
-    return reduce(getattr, names, module)
+def get_module_by_name(model, access_string):
+    if isinstance(access_string, str):
+        names = access_string.split(sep='.')
+        module = model
+        for name in names:
+            module = getattr(module, name)
+    else:
+        module = access_string
+    return module
 
 
 def denormalize(img, mean_tuple, std_tuple):
@@ -362,8 +364,9 @@ def show_gradcam_mislabelled(model, device, x_test, y_test, y_pred,
             rgb_img = denormalize(im_orig.cpu().numpy().squeeze(), mean_tuple, std_tuple )
             model.eval()
             # Instantiate GradCAM
-            layer_names = [layer]
-            layers = [model._modules[name] for name in layer_names]
+            # layer_names = [layer]
+            layers = [get_module_by_name(model, layer)]
+            # layers = [model._modules[name] for name in layer_names]
             gradcam = GradCAM(model=model, target_layers=layers, use_cuda=True)
             cam = gradcam(im_orig)
             cam = cam[0, :]
