@@ -14,8 +14,8 @@ dropout_value = 0.05
 # https://github.com/lucidrains/vit-pytorch/blob/main/vit_pytorch/vit.py
 
 
-# from einops import rearrange, repeat
-# from einops.layers.torch import Rearrange
+from einops import rearrange, repeat
+from einops.layers.torch import Rearrange
 
 
 # helpers
@@ -52,38 +52,33 @@ class FeedForward(nn.Module):
 
 
 class Attention(nn.Module):
-    def __init__(self, dim, heads = 8, dim_head = 64, dropout = 0.):
+    def __init__(self, dim, heads=8, dim_head=64, dropout=0.):
         super().__init__()
-        inner_dim = dim_head *  heads
+        inner_dim = dim_head * heads
         project_out = not (heads == 1 and dim_head == dim)
 
         self.heads = heads
         self.scale = dim_head ** -0.5
 
-        self.attend = nn.Softmax(dim = -1)
-        
-        self.to_q = nn.Conv2d(dim, inner_dim, kernel_size=1, bias=False)
-        self.to_k = nn.Conv2d(dim, inner_dim, kernel_size=1, bias=False)
-        self.to_v = nn.Conv2d(dim, inner_dim, kernel_size=1, bias=False)
+        self.attend = nn.Softmax(dim=-1)
+        self.to_qkv = nn.Linear(dim, inner_dim * 3, bias=False)
 
         self.to_out = nn.Sequential(
-            nn.Conv2d(inner_dim, dim, kernel_size=1),
+            nn.Linear(inner_dim, dim),
             nn.Dropout(dropout)
         ) if project_out else nn.Identity()
 
     def forward(self, x):
-        q = self.to_q(x)
-        k = self.to_k(x)
-        v = self.to_v(x)
-
-        q, k, v = map(lambda t: rearrange(t, 'b c (h w) -> b h w c', h = self.heads), (q, k, v))
+        qkv = self.to_qkv(x).chunk(3, dim=-1)
+        q, k, v = map(
+            lambda t: rearrange(t, 'b n (h d) -> b h n d', h=self.heads), qkv)
 
         dots = torch.matmul(q, k.transpose(-1, -2)) * self.scale
 
         attn = self.attend(dots)
 
         out = torch.matmul(attn, v)
-        out = rearrange(out, 'b h w c -> b c (h w)')
+        out = rearrange(out, 'b h n d -> b n (h d)')
         return self.to_out(out)
 
 
@@ -112,25 +107,83 @@ class ViT(nn.Module):
         super().__init__()
         image_height, image_width = pair(image_size)
         patch_height, patch_width = pair(patch_size)
-
         assert image_height % patch_height == 0 and image_width % patch_width == 0, 'Image dimensions must be divisible by the patch size.'
-
-        # num_patches = (image_height // patch_height) * (
-        #             image_width // patch_width)
-        num_patches = channels
-        # patch_dim = channels * patch_height * patch_width
+        num_patches = channels  # We are using a Conv2d logic for patches
+        # and will express patches as conv2d channels instead of taking the
+        # real, direct "physical-patches" of input image.
         assert pool in {'cls',
                         'mean'}, 'pool type must be either cls (cls token) or mean (mean pooling)'
 
+        flattened_patch_dim = (image_height // patch_height) * (
+                image_height // patch_height)  # each flattened/composed
+        # -patches of  32 channels/num_patches (for ex: 256 here)
         self.to_patch_embedding = nn.Sequential(
-            nn.Conv2d(in_channels, channels, (3, 3), padding=1),
+            # Below comments -1 or b (batch_size dimension) are meant.
+            # we want a conversion of input tensor: (-1, 3, 32, 32) to
+            # (-1, 32, dim) for ex: dim = 512 etc. Here in the tensor
+            # size: (-1,32, dim) the num_patches as 32 is the num_channels &
+            # dim (for ex: 512/64 etc.) we extract (preserve) through conv2d
+            # steps as given below:
+
+            # ---------------------------------------------------------------
+            # 1st: 32x32x3 |(3x3x3)x32|32x32x32
+            # ---------------------------------------------------------------
+            # 2nd:            GELU
+            # ---------------------------------------------------------------
+            # 3rd: 32x32x32|(2x2x32)x32|16x16x32 (patch_size here being: 2x2)
+            # ---------------------------------------------------------------
+            # 4th:            GELU
+            # ---------------------------------------------------------------
+            # 5th: einops.rearrange(x, 'b c h w -> b c (h w)') (i.e. for ex:
+            # (-1, 32, 16, 16 )-- as obtained in the previous conv2d step
+            # converts to (-1, 32, 256) (i.e. (batch_size, num_patches,
+            # each flattened/composed-patches of  32 channels/num_patches)
+            # ---------------------------------------------------------------
+            # 6th:  einops.rearrange(x, 'b c h -> b h c 1') or x.permute(
+            # 0, 2, 1).unsqueeze(-1) i.e.  permute dimensions and add a new
+            # dimension for next 1x1 conv2d step i.e. after this we have the
+            # tensor size as (-1, 256, 32, 1). Here, effectively we want to
+            # convert the 256 dimension (i.e. the one which was the flattened
+            # content of each patch, out of the 32 channels/patches, as
+            # extracted  from very early conv2d steps) to a desired dimension
+            # (dim) for each transformer block, hence the 256 was taken to
+            # the dimension position of channels as 1x1 and up/down-move it
+            # to any higher/lower (or desired dimension)
+            # ---------------------------------------------------------------
+            # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
+            # i.e. the tensor shape now after this 1x1 conv2d step:
+            # (-1, dim , 32, 1) or for ex: with dim=512: (-1, 512, 32, 1)
+            # ---------------------------------------------------------------
+            # 8th:            GELU
+            # ---------------------------------------------------------------
+            # 9th: einops.rearrange(x, 'b h c 1 -> b c h') or  x.squeeze(
+            # -1).permute(0, 2, 1) or remove last "1" so as to get a
+            # tensor of size (-1, 32, dim) or for ex: for dim=512 (2, 32, 512)
+            # So, finally, we will have the desired:
+            # (-1, number_of_original_extracted_patches, dim) sized tensor
+            # from this "to_patch_embedding" block, which would be compatible
+            # with the given code (https://github.com/lucidrains/vit-pytorch/
+            # blob/main/vit_pytorch/vit.py )
+            # ---------------------------------------------------------------
+
+            # 1st: 32x32x3 |(3x3x3)x32|32x32x32
+            nn.Conv2d(in_channels, num_patches, (3, 3), padding=1),
+            # 2nd:            GELU
             nn.GELU(),
-            nn.Conv2d(channels, channels, patch_size, stride=patch_size),
-            nn.Flatten(start_dim=2),
-            nn.Conv2d(channels, dim, (1, 1)),
-            # Rearrange('b c (h p1) (w p2) -> b (h w) (p1 p2 c)', p1=patch_height,
-            #           p2=patch_width),
-            # nn.Linear(patch_dim, dim),
+            # 3rd: 32x32x32|(2x2x32)x32|16x16x32 (patch_size here being: 2x2)
+            nn.Conv2d(num_patches, num_patches, patch_size, stride=patch_size),
+            # 4th:            GELU
+            nn.GELU(),
+            # 5th: einops.rearrange(x, 'b c h w -> b c (h w)')
+            Rearrange('b c h w -> b c (h w)'),
+            # 6th:  einops.rearrange(x, 'b c h -> b h c 1')
+            Rearrange('b c h -> b h c 1'),
+            # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
+            nn.Conv2d(flattened_patch_dim, dim, (1, 1)),
+            # 8th:            GELU
+            nn.GELU(),
+            # 9th: einops.rearrange(x, 'b h c 1 -> b c h')
+            Rearrange('b h c 1 -> b c h'),
         )
 
         self.pos_embedding = nn.Parameter(torch.randn(1, num_patches + 1, dim))
@@ -145,7 +198,8 @@ class ViT(nn.Module):
 
         self.mlp_head = nn.Sequential(
             nn.LayerNorm(dim),
-            nn.Conv2d(dim, num_classes, kernel_size=1)
+            nn.Linear(dim, num_classes)
+            # nn.Conv2d(dim, num_classes, kernel_size=1)
         )
 
     def forward(self, img):
