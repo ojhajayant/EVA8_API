@@ -695,7 +695,7 @@ def main_session_10_vit():
             model_name=model_name)
         y_test = np.array(test_dataset.targets)
         print(
-            "The confusion-matrix and classification-report for this model are:")
+            "The confusion-matrix and classification-report for this model are:\n")
         y_pred = misc.model_pred(model, device, y_test, test_dataset)
         x_test = test_dataset.data
         misc.display_mislabelled(model, device, x_test, y_test.reshape(-1, 1),
@@ -708,6 +708,8 @@ def main_session_10_vit():
         filepath = os.path.join(save_dir, model_name)
         checkpoint = torch.load(filepath)
         model.load_state_dict(checkpoint['state_dict'])
+        print(
+            "\n\n\t\tThe misclassified images with gradcam for this model are:")
         misc.show_gradcam_mislabelled(model, device, x_test,
                                       y_test.reshape(-1, 1), y_pred,
                                       test_dataset, mean_tuple,
