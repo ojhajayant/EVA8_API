@@ -596,20 +596,20 @@ def main_session_10_vit():
 
     criterion = args.criterion  # nn.NLLLoss()
 
-    optimizer = optim.Adam
+    optimizer = optim.AdamW
 
     device = torch.device("cuda" if args.cuda else "cpu")
     print(device)
 
     # Get the model loaded with summary(10 classes)
     model = vit.ViT(image_size=32, patch_size=2,
-                        num_classes=10, dim=512,
-                        depth=4,
-                        heads=8, mlp_dim=512,
-                        pool='cls',
-                        channels=32,
-                        dim_head=64, dropout=0.,
-                        emb_dropout=0.).to(device)
+                    num_classes=10, dim=64,
+                    depth=2,
+                    heads=4, mlp_dim=64,
+                    pool='cls',
+                    channels=32,
+                    dim_head=16, dropout=0.,
+                    emb_dropout=0.).to(device)
     if args.dataset == 'CIFAR10':
         summary(model, input_size=(3, 32, 32))
     elif args.dataset == 'MNIST':
@@ -656,7 +656,7 @@ def main_session_10_vit():
                             "anneal_strategy": "linear",
                             "div_factor": DIV_FACTOR,
                             "final_div_factor": FINAL_DIV_FACTOR}
-        optimizer = optim.Adam(model.parameters(), **optim_params)
+        optimizer = optim.AdamW(model.parameters(), **optim_params)
         scheduler = torch.optim.lr_scheduler.OneCycleLR(optimizer,
                                                         **scheduler_params)
         last_best = ''
@@ -684,13 +684,13 @@ def main_session_10_vit():
             model_name))
         model = misc.load_model(
             vit.ViT(image_size=32, patch_size=2,
-                        num_classes=10, dim=512,
-                        depth=4,
-                        heads=8, mlp_dim=512,
-                        pool='cls',
-                        channels=32,
-                        dim_head=64, dropout=0.,
-                        emb_dropout=0.),
+                    num_classes=10, dim=64,
+                    depth=2,
+                    heads=4, mlp_dim=64,
+                    pool='cls',
+                    channels=32,
+                    dim_head=16, dropout=0.,
+                    emb_dropout=0.),
             device,
             model_name=model_name)
         y_test = np.array(test_dataset.targets)
