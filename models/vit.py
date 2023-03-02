@@ -64,16 +64,16 @@ class Attention(nn.Module):
         self.to_qkv = nn.Sequential(
             Rearrange('b c h  -> b h c 1'),
             nn.Conv2d(dim, inner_dim*3, kernel_size=1, bias=False),
-            nn.Dropout(dropout),
-            nn.GELU(),
+            # nn.Dropout(dropout),
+            # nn.GELU(),
             Rearrange('b c h 1  -> b h c'),
         )
 
         self.to_out = nn.Sequential(
             Rearrange('b c h  -> b h c 1'),
             nn.Conv2d(inner_dim, dim, kernel_size=1, bias=False),
-            nn.Dropout(dropout),
-            nn.GELU(),
+            # nn.Dropout(dropout),
+            # nn.GELU(),
             Rearrange('b c h 1  -> b h c'),
         ) if project_out else nn.Identity()
 
@@ -190,7 +190,7 @@ class ViT(nn.Module):
         # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
         nn.Conv2d(flattened_patch_dim, dim, (1, 1)),
         # 8th:            GELU
-        nn.GELU(),
+        # nn.GELU(),
         # 9th: einops.rearrange(x, 'b h c 1 -> b c h')
         Rearrange('b h c 1 -> b c h'),
         )
@@ -209,7 +209,7 @@ class ViT(nn.Module):
             nn.LayerNorm(dim),
             Rearrange('b c -> b c 1 1'),
             nn.Conv2d(dim, num_classes, kernel_size=1),
-            nn.GELU(),
+            # nn.GELU(),
             Rearrange('b c 1 1-> b c'),
         )
 
