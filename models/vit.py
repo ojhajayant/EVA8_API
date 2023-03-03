@@ -40,11 +40,20 @@ class FeedForward(nn.Module):
     def __init__(self, dim, hidden_dim, dropout=0.):
         super().__init__()
         self.net = nn.Sequential(
-            nn.Linear(dim, hidden_dim),
+            # Incoming Tensor at this point is
+            # (-1, num_patches(including cls_token), dim)
+            # that needs to convert using 1x1 conv2d so that
+            # "dim -> "hidden_dim", hence we need to
+            # bring the "dim" position to be converted to
+            # the channel position "c" & unsqueeze too
+            # Finally, at the end we reverse the same.
+            Rearrange('b c h  -> b h c 1'),
+            nn.Conv2d(dim, hidden_dim, kernel_size=1, bias=False),
             nn.GELU(),
             nn.Dropout(dropout),
-            nn.Linear(hidden_dim, dim),
-            nn.Dropout(dropout)
+            nn.Conv2d(hidden_dim, dim, kernel_size=1, bias=False),
+            nn.Dropout(dropout),
+            Rearrange('b c h 1  -> b h c'),
         )
 
     def forward(self, x):
