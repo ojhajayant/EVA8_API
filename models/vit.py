@@ -156,7 +156,7 @@ class ViT(nn.Module):
         # content of each patch, out of the 32 channels/patches, as
         # extracted  from very early conv2d steps) to a desired dimension
         # (dim) for each transformer block, hence the 256 was taken to
-        # the dimension position of channels as 1x1 and up/down-move it
+        # the dimension position of channels as 1x1 conv2d can up/down-move it
         # to any higher/lower (or desired dimension)
         # ---------------------------------------------------------------
         # 7th: 32x1x256 | (1x1x256)x dim |32x1 x dim  (for ex: dim = 512)
