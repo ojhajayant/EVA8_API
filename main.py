@@ -713,7 +713,9 @@ def main_session_10_vit():
         misc.show_gradcam_mislabelled(model, device, x_test,
                                       y_test.reshape(-1, 1), y_pred,
                                       test_dataset, mean_tuple,
-                                      std_tuple, layer=model.mlp_head[2] # the 1x1 convolutional layer
+                                      std_tuple, 
+                                      layer=model.transformer.layers[0][1].fn.net[4]
+#                                       layer=model.mlp_head[2] # the 1x1 convolutional layer
 )
 
 
