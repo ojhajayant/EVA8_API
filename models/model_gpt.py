@@ -6,17 +6,33 @@ from utils.utils_gpt import DEVICE
 
 class AttentionHead(nn.Module):
     """
-    One head of the self-attention layer
+    One head of the self-attention layer with sparse attention
     """
 
-    def __init__(self, head_size, num_embed, block_size, dropout):
+    def __init__(self, head_size, num_embed, block_size, dropout, stride=1):
         super().__init__()
+        self.head_size = head_size
+        self.stride = stride
+        self.num_blocks = (block_size + stride - 1) // stride
+
         self.key = nn.Linear(num_embed, head_size, bias=False)
         self.query = nn.Linear(num_embed, head_size, bias=False)
         self.value = nn.Linear(num_embed, head_size, bias=False)
-        # tril is a lower triangular matrix. it is not a parameter
-        # of the model, so we assign it to the module using register_buffer
+
+        # Tril matrix (lower triangular matrix) is used to mask 
+        # future positions (setting them to -inf) so that the
+        # decoder "learns" to predict next words
         self.register_buffer("tril", torch.tril(torch.ones(block_size, block_size)))
+        
+        # Create a mask that will only allow attention to look at
+        # positions that are separated by 'stride'
+        mask = torch.zeros(block_size, block_size)
+        for i in range(self.num_blocks):
+            start_idx = i * stride
+            end_idx = min((i + 1) * stride, block_size)
+            mask[start_idx:end_idx, start_idx:end_idx] = 1
+        mask = mask.to(dtype=torch.bool)
+        self.register_buffer("mask", mask)
 
         # let's also add dropout
         self.dropout = nn.Dropout(dropout)
@@ -28,12 +44,18 @@ class AttentionHead(nn.Module):
         # compute attention scores
         # (B, T, C) @ (B, C, T) -> (B, T, T)
         wei = q @ k.transpose(-2, -1) * C**-0.5
-        # Tril matrix (lower triagular matrix) is used to mask 
-        # future positions (setting them to -inf) so that the
-        # decoder "learns" to predict next words
-        wei = wei.masked_fill(self.tril[:T, :T] == 0, float("-inf"))  # (B,T,T)
+        
+        # Mask positions that are too far away
+        mask = self.mask[:T, :T]
+        wei = wei.masked_fill(~mask, 0)  # (B,T,T)
+        
+        # Set all future positions to -inf
+        tri_mask = self.tril[:T, :T]
+        wei = wei.masked_fill(tri_mask == 0, float("-inf"))  # (B,T,T)
+        
         wei = F.softmax(wei, dim=-1)  # (B,T,T)
         wei = self.dropout(wei)
+        
         # weighted aggregation of the values
         v = self.value(x)
         out = wei @ v  # (B,T,T) @ (B,T,C) ---> (B,T,C)
@@ -54,6 +76,7 @@ class MultiHeadAttention(nn.Module):
                     num_embed=num_embed,
                     block_size=block_size,
                     dropout=dropout,
+                    stride=2
                 )
                 for _ in range(num_heads)
             ]
