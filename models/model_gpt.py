@@ -6,7 +6,11 @@ from utils.utils_gpt import DEVICE
 
 class AttentionHead(nn.Module):
     """
-    One head of the self-attention layer with sparse attention
+    One head of the self-attention layer, with sparse attention.
+    The stride parameter controls the distance between attention
+    positions. By default, it's set to 1, which means that we 
+    look at all positions within the block. If we set it to 
+    a larger number, we will get sparser attention.
     """
 
     def __init__(self, head_size, num_embed, block_size, dropout, stride=1):
